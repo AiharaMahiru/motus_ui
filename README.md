@@ -11,6 +11,17 @@ Motus Agent Workbench is a local-first agent project built on top of the Motus S
 
 The goal is not to ship another chat wrapper. The goal is to consolidate **sessions, tool execution, approvals, tracing, preview, and visualization** into one reusable local agent architecture that can keep evolving into desktop, Tauri, or other UI surfaces.
 
+![Motus Agent Workbench banner](docs/assets/readme-banner.svg)
+
+## Navigation
+
+- [Highlights](#highlights) for the product-level overview.
+- [Architecture](#architecture) for the backend and runtime topology.
+- [Quick Start](#quick-start) for the shortest path to a working local setup.
+- [Who Is This For](#who-is-this-for) for intended users and teams.
+- [Roadmap](#roadmap) for the next major directions.
+- [Documentation](#documentation) for deeper project references.
+
 ## Highlights
 
 - Session-first architecture with per-session config, history, title generation, usage, cost, and runtime state.
@@ -75,6 +86,7 @@ core/servers/          FastAPI and HITL servers
 core/schemas/          Shared schemas for backend and frontend
 core/workflows/        Workflow registry, execution, persistence
 docs/                  Architecture notes, plans, smoke results
+docs/assets/           README assets and repository visuals
 scripts/smoke/         End-to-end and system smoke scripts
 skills/                Runtime skill entry layer
 tests/                 Python tests
@@ -202,6 +214,20 @@ curl -N http://127.0.0.1:8000/api/sessions/<session_id>/messages/stream \
   -H 'Content-Type: application/json' \
   -d '{"content":"Use tools first, then summarize the result."}'
 ```
+
+## Who Is This For
+
+- Engineers building local-first agent applications with real session state and tool execution.
+- Product teams that need approval gates, interrupt/resume flows, and HITL-ready backend contracts.
+- Applied AI builders who want preview runtimes, visualization blocks, and workflow orchestration in one stack.
+- Developers who prefer a Python backend with a modern React WebUI instead of stitching together multiple prototypes.
+
+## Roadmap
+
+- Harden the desktop packaging path around the current backend and WebUI split for future Tauri delivery.
+- Keep reducing large file hotspots and state coupling in both backend routers and page-level frontend controllers.
+- Expand runtime catalog, workflow control, and multi-agent operations into more explicit product surfaces.
+- Add stronger visual regression, smoke coverage, and release automation for public open-source maintenance.
 
 ## Repository Conventions
 
