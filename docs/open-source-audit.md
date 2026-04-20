@@ -9,6 +9,7 @@
 - 已重写根 `README.md`，压缩为开源入口文档。
 - 已新增 `CONTRIBUTING.md`、`SECURITY.md` 和 `docs/open-source-release-checklist.md`。
 - 已把 `pyproject.toml` 的占位描述改为项目描述，包名改为 `motus-agent-workbench`。
+- 根仓库许可证已经明确为 `Apache-2.0`，并将同步到 `README.md` 与包元数据。
 
 ## 敏感信息扫描
 
@@ -63,8 +64,7 @@ rm -rf runtime
 
 ## 发布前待确认
 
-- 选择并添加正式 `LICENSE`。
-- 确认是否公开 `vendor/minimax-skills/`，以及它的许可证兼容性。
+- 确认 `vendor/minimax-skills/` 子模块在公开克隆场景下可正常初始化，并接受其上游许可证边界。
 - 确认是否保留历史规划类文档，或迁移到 `docs/archive/`。
 - 确认是否需要公开示例截图；如需要，应先脱敏并移动到 `docs/assets/`。
 

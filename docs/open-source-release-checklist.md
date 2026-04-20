@@ -4,11 +4,13 @@
 
 ## 必须确认
 
+- 根仓库许可证固定为 `Apache-2.0`，并与 `README.md`、包元数据保持一致。
 - `.env` 只保留在本地，公开仓库仅提交 `.env.example`。
 - `runtime/`、`release/`、`web/dist/`、`web/coverage/`、`web/test-results/` 不进入开源仓库。
 - `node_modules/`、`web/node_modules/`、`.venv/`、`*.egg-info/`、`__pycache__/` 不进入开源仓库。
 - 会话日志、截图、预览产物和真实 provider 联调结果属于运行产物，默认不公开。
 - 若需要公开示例截图或 smoke 结果，应先脱敏并移动到 `docs/assets/` 或单独的示例目录。
+- `vendor/minimax-skills/` 是第三方子模块，发布时要确认 submodule 地址、上游可访问性和许可证说明。
 
 ## 建议保留
 

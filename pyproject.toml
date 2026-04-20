@@ -3,7 +3,14 @@ name = "motus-agent-workbench"
 version = "0.1.0"
 description = "Motus SDK based local agent backend and web workbench."
 readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.14"
+keywords = ["motus", "agent", "workbench", "fastapi", "react", "hitl", "workflow"]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+]
 dependencies = [
     "fastapi>=0.115.0",
     "firecrawl-py>=4.22.2",
