@@ -38,7 +38,7 @@ async def run() -> list[SmokeCaseResult]:
             created.raise_for_status()
             session_id = created.json()["session_id"]
 
-            sent = await client.post(f"/sessions/{session_id}/messages", json={"content": "开始"})
+            sent = await client.post(f"/sessions/{session_id}/messages", json={"content": "Start"})
             sent.raise_for_status()
 
             interrupt_payload = None
@@ -56,13 +56,13 @@ async def run() -> list[SmokeCaseResult]:
             if interrupt_payload is None:
                 return [
                     case_result(
-                        name="HITL Demo 状态机",
+                        name="HITL demo state machine",
                         started_at=started_at,
                         status="failed",
-                        summary="demo server 未进入 interrupted 状态",
+                        summary="demo server did not enter interrupted state",
                         details=[f"base_url={base_url}", f"session_id={session_id}"],
                         artifacts=[str(process.stdout_path), str(process.stderr_path)],
-                        error="未拿到 interrupt_payload",
+                        error="interrupt_payload was not received",
                     )
                 ]
 
@@ -70,7 +70,7 @@ async def run() -> list[SmokeCaseResult]:
                 f"/sessions/{session_id}/resume",
                 json={
                     "interrupt_id": interrupt_payload["interrupt_id"],
-                    "value": {"answers": {"是否继续当前操作？": "继续"}},
+                    "value": {"answers": {"Continue the current operation?": "Continue"}},
                 },
             )
             resumed.raise_for_status()
@@ -89,13 +89,13 @@ async def run() -> list[SmokeCaseResult]:
             if final_detail:
                 assistant_content = (final_detail.get("response") or {}).get("content", "")
 
-            passed = final_detail is not None and "收到用户回复" in assistant_content
+            passed = final_detail is not None and "Received user reply" in assistant_content
             return [
                 case_result(
-                    name="HITL Demo 状态机",
+                    name="HITL demo state machine",
                     started_at=started_at,
                     status="passed" if passed else "failed",
-                    summary="HITL demo 成功完成 interrupt -> resume -> idle 流程" if passed else "HITL demo 状态机未达到预期",
+                    summary="HITL demo completed interrupt -> resume -> idle flow" if passed else "HITL demo state machine did not meet expectations",
                     details=[
                         f"base_url={base_url}",
                         f"session_id={session_id}",
@@ -103,7 +103,7 @@ async def run() -> list[SmokeCaseResult]:
                         f"assistant_content={assistant_content!r}",
                     ],
                     artifacts=[str(process.stdout_path), str(process.stderr_path)],
-                    error=None if passed else "resume 后未回到 idle 或未拿到最终回复",
+                    error=None if passed else "Did not return to idle after resume or final reply was missing",
                 )
             ]
     finally:

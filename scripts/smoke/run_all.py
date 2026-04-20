@@ -18,7 +18,7 @@ from scripts.smoke.common import (
 )
 
 
-RESULTS_DOC_PATH = PROJECT_ROOT / "docs" / "system-smoke-test-results.md"
+RESULTS_DOC_PATH = SMOKE_RUNTIME_DIR / "system-smoke-test-results.md"
 RESULTS_JSON_PATH = SMOKE_RUNTIME_DIR / "system-smoke-test-results.json"
 
 
@@ -37,10 +37,10 @@ async def _run_static_checks() -> list[SmokeCaseResult]:
     passed = compile_result.returncode == 0 and import_result.returncode == 0
     return [
         case_result(
-            name="静态与入口校验",
+            name="Static and Entrypoint Validation",
             started_at=started_at,
             status="passed" if passed else "failed",
-            summary="语法编译和入口模块导入通过" if passed else "语法编译或入口模块导入失败",
+            summary="Syntax compilation and module imports passed" if passed else "Syntax compilation or entrypoint imports failed",
             details=[
                 f"py_compile.returncode={compile_result.returncode}",
                 f"imports.returncode={import_result.returncode}",
@@ -48,7 +48,7 @@ async def _run_static_checks() -> list[SmokeCaseResult]:
                 f"py_compile.stderr={compile_result.stderr.strip()!r}",
                 f"imports.stderr={import_result.stderr.strip()!r}",
             ],
-            error=None if passed else "静态检查未通过",
+            error=None if passed else "Static validation failed",
         )
     ]
 
@@ -71,7 +71,7 @@ async def _run_with_capture(name: str, module_name: str) -> list[SmokeCaseResult
                 name=name,
                 started_at=now_iso(),
                 status="failed",
-                summary=f"{name} 在执行过程中抛出异常",
+                summary=f"{name} raised an exception during execution",
                 error=f"{type(exc).__name__}: {exc}",
             )
         ]
@@ -80,22 +80,22 @@ async def _run_with_capture(name: str, module_name: str) -> list[SmokeCaseResult
 async def run_all() -> list[SmokeCaseResult]:
     results: list[SmokeCaseResult] = []
     results.extend(await _run_static_checks())
-    results.extend(await _run_with_capture("本地 backend smoke", "scripts.smoke.local_backend"))
-    results.extend(await _run_with_capture("workflow tracing smoke", "scripts.smoke.workflow_tracing"))
+    results.extend(await _run_with_capture("Local backend smoke", "scripts.smoke.local_backend"))
+    results.extend(await _run_with_capture("Workflow tracing smoke", "scripts.smoke.workflow_tracing"))
     results.extend(await _run_with_capture("HTTP API smoke", "scripts.smoke.http_api"))
     results.extend(await _run_with_capture("WebUI smoke", "scripts.smoke.webui"))
     results.extend(await _run_with_capture("HITL demo smoke", "scripts.smoke.hitl_demo"))
     if os.getenv("SMOKE_INCLUDE_REAL_HITL_WEBUI", "0") == "1":
-        results.extend(await _run_with_capture("真实 HITL WebUI smoke", "scripts.smoke.hitl_real_webui"))
+        results.extend(await _run_with_capture("Real HITL WebUI smoke", "scripts.smoke.hitl_real_webui"))
     results.extend(await _run_with_capture("TUI smoke", "scripts.smoke.tui_smoke"))
-    results.extend(await _run_with_capture("外部依赖 smoke", "scripts.smoke.external_tools"))
+    results.extend(await _run_with_capture("External dependency smoke", "scripts.smoke.external_tools"))
     return results
 
 
 def write_results(results: list[SmokeCaseResult]) -> None:
     generated_at = now_iso()
     RESULTS_DOC_PATH.write_text(
-        markdown_report("系统级 Smoke Test 结果", results, generated_at=generated_at),
+        markdown_report("System Smoke Test Results", results, generated_at=generated_at),
         encoding="utf-8",
     )
     RESULTS_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -117,8 +117,8 @@ def main() -> None:
     write_results(results)
     for item in results:
         print(f"[{item.status}] {item.name}: {item.summary}")
-    print(f"结果文档：{RESULTS_DOC_PATH}")
-    print(f"结果 JSON：{RESULTS_JSON_PATH}")
+    print(f"results_doc: {RESULTS_DOC_PATH}")
+    print(f"results_json: {RESULTS_JSON_PATH}")
 
 
 if __name__ == "__main__":

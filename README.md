@@ -85,7 +85,7 @@ core/preview/          HTML / React / Python preview runtime
 core/servers/          FastAPI and HITL servers
 core/schemas/          Shared schemas for backend and frontend
 core/workflows/        Workflow registry, execution, persistence
-docs/                  Architecture notes, plans, smoke results
+docs/                  Stable public-facing documentation
 docs/assets/           README assets and repository visuals
 scripts/smoke/         End-to-end and system smoke scripts
 skills/                Runtime skill entry layer
@@ -96,11 +96,14 @@ web/                   React WebUI
 runtime/               Local runtime artifacts, not committed
 ```
 
-Additional docs:
+Primary docs:
 
-- [`docs/项目结构梳理.md`](docs/%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84%E6%A2%B3%E7%90%86.md)
-- [`docs/开发文档.md`](docs/%E5%BC%80%E5%8F%91%E6%96%87%E6%A1%A3.md)
-- [`docs/前端接入说明.md`](docs/%E5%89%8D%E7%AB%AF%E6%8E%A5%E5%85%A5%E8%AF%B4%E6%98%8E.md)
+- [`docs/project-structure.md`](docs/project-structure.md)
+- [`docs/development-guide.md`](docs/development-guide.md)
+- [`docs/frontend-integration-guide.md`](docs/frontend-integration-guide.md)
+- [`docs/runtime-requirements.md`](docs/runtime-requirements.md)
+- [`docs/open-source-release-checklist.md`](docs/open-source-release-checklist.md)
+- [`docs/open-source-audit.md`](docs/open-source-audit.md)
 
 ## Quick Start
 
@@ -241,6 +244,9 @@ curl -N http://127.0.0.1:8000/api/sessions/<session_id>/messages/stream \
 - [`AGENTS.md`](AGENTS.md): contributor and coding conventions
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): contribution process
 - [`SECURITY.md`](SECURITY.md): security policy
+- [`docs/project-structure.md`](docs/project-structure.md): codebase layout and structural guidance
+- [`docs/development-guide.md`](docs/development-guide.md): engineering conventions and backend/frontend boundaries
+- [`docs/frontend-integration-guide.md`](docs/frontend-integration-guide.md): frontend contract and capability guidance
 - [`docs/runtime-requirements.md`](docs/runtime-requirements.md): runtime requirements for tools, MCP, and skills
 - [`docs/open-source-release-checklist.md`](docs/open-source-release-checklist.md): release checklist
 - [`docs/open-source-audit.md`](docs/open-source-audit.md): repository open-source audit

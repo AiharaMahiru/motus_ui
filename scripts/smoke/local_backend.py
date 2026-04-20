@@ -25,22 +25,22 @@ async def _run_basic_session() -> SmokeCaseResult:
     session = service.create_session(
         SessionCreateRequest(
             model_name=SMOKE_MODEL_NAME,
-            system_prompt="你是回归测试助手。用户要求返回 token 时，必须原样返回，不要添加额外解释。",
+            system_prompt="You are a regression-test assistant. When the user asks for a token, return it exactly and add no explanation.",
             thinking=ThinkingConfig(enabled=False, effort=None, verbosity=None),
         )
     )
     response = await service.send_message(
         session.session_id,
-        f"请原样返回这个 token：{token}",
+        f"Return this token exactly: {token}",
     )
     exported = tracing_service.export(session_id=session.session_id)
 
     content = response.assistant.content if response.assistant else ""
     passed = token in (content or "")
     status = "passed" if passed else "failed"
-    summary = "本地普通会话完成并导出 session trace" if passed else "本地普通会话返回内容不符合预期"
+    summary = "Local basic session completed and session trace was exported" if passed else "Local basic session returned unexpected content"
     return case_result(
-        name="本地普通会话",
+        name="Local basic session",
         started_at=started_at,
         status=status,
         summary=summary,
@@ -51,7 +51,7 @@ async def _run_basic_session() -> SmokeCaseResult:
             f"trace_files={exported.files}",
         ],
         artifacts=[session.trace_log_dir or "", *[str(Path(exported.log_dir) / name) for name in exported.files]],
-        error=None if passed else f"assistant 未返回期望 token: {token}",
+        error=None if passed else f"assistant did not return expected token: {token}",
     )
 
 
@@ -64,7 +64,7 @@ async def _run_multi_agent_session() -> SmokeCaseResult:
     target_file.write_text(
         "\n".join(
             [
-                "这是一个多代理 smoke 测试文件。",
+                "This is a multi-agent smoke-test file.",
                 f"SMOKE_CODE={expected_code}",
             ]
         ),
@@ -75,8 +75,8 @@ async def _run_multi_agent_session() -> SmokeCaseResult:
         SessionCreateRequest(
             model_name=SMOKE_MODEL_NAME,
             system_prompt=(
-                "你是协调者。你自己没有直接文件读取能力，遇到本地文件任务时必须委派给最合适的子代理。"
-                "不要猜测文件内容。最终答案只返回解析结果。"
+                "You are the coordinator. You cannot read files directly and must delegate local file tasks to the most suitable specialist."
+                "Do not guess file contents. Return only the extracted result."
             ),
             thinking=ThinkingConfig(enabled=False, effort=None, verbosity=None),
             enabled_tools=[],
@@ -85,7 +85,7 @@ async def _run_multi_agent_session() -> SmokeCaseResult:
                 specialists=[
                     SpecialistAgentConfig(
                         name="researcher",
-                        description="负责读取本地文件并提取其中的关键信息。",
+                        description="Responsible for reading local files and extracting key information.",
                         enabled_tools=["read_file"],
                     )
                 ],
@@ -95,7 +95,7 @@ async def _run_multi_agent_session() -> SmokeCaseResult:
 
     response = await service.send_message(
         session.session_id,
-        f"请读取文件 {target_file.resolve()} ，找出其中的 SMOKE_CODE，最终只返回格式 CODE=<值>。",
+        f"Read file {target_file.resolve()} and find SMOKE_CODE. Return only CODE=<value>.",
     )
     exported = tracing_service.export(session_id=session.session_id)
     content = response.assistant.content if response.assistant else ""
@@ -108,10 +108,10 @@ async def _run_multi_agent_session() -> SmokeCaseResult:
     status = "passed" if passed else "failed"
 
     return case_result(
-        name="本地多代理会话",
+        name="Local multi-agent session",
         started_at=started_at,
         status=status,
-        summary="多代理委派成功，专家参与了本地文件读取" if passed else "多代理未稳定触发专家委派或答案不正确",
+        summary="Multi-agent delegation succeeded and the specialist read the local file" if passed else "Multi-agent delegation was not triggered reliably or the answer was incorrect",
         details=[
             f"session_id={session.session_id}",
             f"assistant={content!r}",

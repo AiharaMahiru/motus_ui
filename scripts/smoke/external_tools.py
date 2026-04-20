@@ -19,8 +19,8 @@ async def _run_firecrawl_search() -> SmokeCaseResult:
         SessionCreateRequest(
             model_name=SMOKE_MODEL_NAME,
             system_prompt=(
-                "你是网页工具 smoke tester。遇到联网检索任务时必须先调用 web_search，"
-                "不要凭记忆直接回答。最后只返回一句简短结论。"
+                "You are a web-tool smoke tester. For web-search tasks, you must call web_search first. "
+                "Do not answer from memory. Return one short conclusion only."
             ),
             thinking=ThinkingConfig(enabled=False, effort=None, verbosity=None),
             enabled_tools=["web_search"],
@@ -30,7 +30,7 @@ async def _run_firecrawl_search() -> SmokeCaseResult:
     event_queue: asyncio.Queue[dict] = asyncio.Queue()
     turn_task = asyncio.create_task(
         service.get_session(session.session_id).ask(
-            "请搜索 OpenAI，并用一句话概括你看到的首屏结果主题。",
+            "Search OpenAI and summarize the first-page result theme in one sentence.",
             event_queue=event_queue,
         )
     )
@@ -50,16 +50,16 @@ async def _run_firecrawl_search() -> SmokeCaseResult:
     content = result.assistant.content or ""
     passed = "web_search" in observed_tool_calls and bool(content.strip())
     return case_result(
-        name="Firecrawl 网页检索",
+        name="Firecrawl web search",
         started_at=started_at,
         status="passed" if passed else "failed",
-        summary="agent 成功通过 web_search 完成联网检索" if passed else "网页检索未稳定触发 web_search 或返回为空",
+        summary="Agent completed web search through web_search" if passed else "Web search did not reliably trigger web_search or returned empty content",
         details=[
             f"session_id={session.session_id}",
             f"observed_tool_calls={observed_tool_calls}",
             f"assistant={content!r}",
         ],
-        error=None if passed else "web_search 未出现在 step 工具调用里",
+        error=None if passed else "web_search did not appear in step tool calls",
     )
 
 
@@ -70,20 +70,20 @@ async def _run_mcp_probe() -> SmokeCaseResult:
 
     if not remote_url and not local_command:
         return case_result(
-            name="MCP 集成探测",
+            name="MCP integration probe",
             started_at=started_at,
             status="skipped",
-            summary="当前环境未提供可用的 MCP 测试目标，自动跳过",
+            summary="No usable MCP test target was provided; skipping automatically",
             details=[
-                "可通过 SMOKE_MCP_REMOTE_URL 或 SMOKE_MCP_LOCAL_COMMAND 注入测试目标。",
+                "Set SMOKE_MCP_REMOTE_URL or SMOKE_MCP_LOCAL_COMMAND to inject a test target.",
             ],
         )
 
     return case_result(
-        name="MCP 集成探测",
+        name="MCP integration probe",
         started_at=started_at,
         status="skipped",
-        summary="已探测到 MCP 测试配置入口，但当前脚本尚未实现自动握手链路",
+        summary="MCP test configuration was detected, but automated handshake is not implemented yet",
         details=[
             f"SMOKE_MCP_REMOTE_URL={remote_url}",
             f"SMOKE_MCP_LOCAL_COMMAND={local_command}",

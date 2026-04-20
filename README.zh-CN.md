@@ -165,6 +165,9 @@ npm run lint
 - `AGENTS.md`
 - `CONTRIBUTING.md`
 - `SECURITY.md`
+- `docs/project-structure.md`
+- `docs/development-guide.md`
+- `docs/frontend-integration-guide.md`
 - `docs/runtime-requirements.md`
 - `docs/open-source-release-checklist.md`
 - `docs/open-source-audit.md`

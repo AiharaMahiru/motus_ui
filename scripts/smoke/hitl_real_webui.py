@@ -22,7 +22,7 @@ from scripts.smoke.hitl_real_support import resolve_real_hitl_model
 
 
 WEB_DIR = PROJECT_ROOT / "web"
-RESULTS_DOC_PATH = PROJECT_ROOT / "docs" / "真实-HITL-WebUI-联调结果.md"
+RESULTS_DOC_PATH = SMOKE_RUNTIME_DIR / "real-hitl-webui-results.md"
 RESULTS_JSON_PATH = SMOKE_RUNTIME_DIR / "real-hitl-webui-results.json"
 
 
@@ -40,12 +40,12 @@ async def run() -> list[SmokeCaseResult]:
     if resolved_model is None:
         return [
             case_result(
-                name="真实 HITL WebUI 联调",
+                name="Real HITL WebUI validation",
                 started_at=started_at,
                 status="failed",
-                summary="未探测到可用真实模型，无法执行真实 WebUI HITL 联调",
+                summary="No usable real model was detected; real WebUI HITL validation cannot run",
                 details=probe_logs,
-                error="模型探测失败",
+                error="model detection failed",
             )
         ]
 
@@ -103,10 +103,10 @@ async def run() -> list[SmokeCaseResult]:
         passed = e2e_result.returncode == 0
         results.append(
             case_result(
-                name="真实 HITL WebUI 联调",
+                name="Real HITL WebUI validation",
                 started_at=started_at,
                 status="passed" if passed else "failed",
-                summary="真实 HITL WebUI user_input / approval 页面闭环通过" if passed else "真实 HITL WebUI 联调未通过",
+                summary="Real HITL WebUI user_input / approval page loop passed" if passed else "Real HITL WebUI validation failed",
                 details=[
                     f"api_base_url={api_base_url}",
                     f"hitl_base_url={hitl_base_url}",
@@ -126,7 +126,7 @@ async def run() -> list[SmokeCaseResult]:
                     str(web_process.stderr_path),
                     str(WEB_DIR / "test-results"),
                 ],
-                error=None if passed else "真实 HITL WebUI Playwright 执行失败",
+                error=None if passed else "Real HITL WebUI Playwright execution failed",
             )
         )
     finally:
@@ -140,7 +140,7 @@ async def run() -> list[SmokeCaseResult]:
 def write_results(results: list[SmokeCaseResult]) -> None:
     generated_at = now_iso()
     RESULTS_DOC_PATH.write_text(
-        markdown_report("真实 HITL WebUI 联调结果", results, generated_at=generated_at),
+        markdown_report("Real HITL WebUI Results", results, generated_at=generated_at),
         encoding="utf-8",
     )
     RESULTS_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -162,8 +162,8 @@ def main() -> None:
     write_results(results)
     for item in results:
         print(f"[{item.status}] {item.name}: {item.summary}")
-    print(f"结果文档：{RESULTS_DOC_PATH}")
-    print(f"结果 JSON：{RESULTS_JSON_PATH}")
+    print(f"results_doc: {RESULTS_DOC_PATH}")
+    print(f"results_json: {RESULTS_JSON_PATH}")
 
 
 if __name__ == "__main__":

@@ -1,1 +1,1 @@
-"""系统级 smoke test 脚本。"""
+"""System-level smoke test scripts."""

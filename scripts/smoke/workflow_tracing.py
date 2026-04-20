@@ -16,7 +16,7 @@ async def _run_workflow_text_insights() -> SmokeCaseResult:
     detail = await workflow_service.start_run(
         WorkflowRunRequest(
             workflow_name="text_insights",
-            input_payload={"text": "# 标题\n\n这是第一段。\n\n这是第二段。"},
+            input_payload={"text": "# Title\n\nThis is the first paragraph.\n\nThis is the second paragraph."},
         )
     )
     run_id = detail.run_id
@@ -35,7 +35,7 @@ async def _run_workflow_text_insights() -> SmokeCaseResult:
         name="Workflow Text Insights",
         started_at=started_at,
         status="passed" if passed else "failed",
-        summary="workflow 运行完成并成功导出 workflow run 级 trace" if passed else "workflow 或 tracing 导出未达到预期",
+        summary="Workflow completed and workflow-run trace export succeeded" if passed else "Workflow or tracing export did not meet expectations",
         details=[
             f"run_id={run_id}",
             f"workflow_status={current.status}",
@@ -45,7 +45,7 @@ async def _run_workflow_text_insights() -> SmokeCaseResult:
             f"output_keys={sorted((current.output_payload or {}).keys())}",
         ],
         artifacts=[current.trace_log_dir or "", *[f"{exported.log_dir}/{name}" for name in exported.files]],
-        error=None if passed else current.error or "workflow tracing 导出失败",
+        error=None if passed else current.error or "Workflow tracing export failed",
     )
 
 

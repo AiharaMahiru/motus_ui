@@ -1,29 +1,29 @@
-# 开源整理审计记录
+# Open Source Audit Record
 
-审计时间：2026-04-20
+Audit date: 2026-04-20
 
-## 已完成
+## Completed
 
-- 根 `.gitignore` 已覆盖 `.env`、`.env.*`、`runtime/`、`release/`、`.venv/`、`node_modules/`、`web/dist/`、`web/coverage/`、`web/test-results/`、`*.egg-info/`、`__pycache__/`、`*.pyc` 和本地任务 scratch 文件。
-- 已新增 `.env.example`，只保留环境变量名和空值。
-- 已重写根 `README.md`，压缩为开源入口文档。
-- 已新增 `CONTRIBUTING.md`、`SECURITY.md` 和 `docs/open-source-release-checklist.md`。
-- 已把 `pyproject.toml` 的占位描述改为项目描述，包名改为 `motus-agent-workbench`。
-- 根仓库许可证已经明确为 `Apache-2.0`，并将同步到 `README.md` 与包元数据。
+- Root `.gitignore` now covers `.env`, `.env.*`, `runtime/`, `release/`, `.venv/`, `node_modules/`, `web/dist/`, `web/coverage/`, `web/test-results/`, `*.egg-info/`, `__pycache__/`, `*.pyc`, and local task scratch files.
+- `.env.example` was added and contains variable names only, with no real secret values.
+- The root `README.md` was rewritten into a public repository landing page.
+- `CONTRIBUTING.md`, `SECURITY.md`, and `docs/open-source-release-checklist.md` were added.
+- `pyproject.toml` metadata was normalized and the package name was set to `motus-agent-workbench`.
+- The root repository license is explicitly aligned with `Apache-2.0` and reflected in both documentation and package metadata.
 
-## 敏感信息扫描
+## Sensitive Information Scan
 
-扫描范围排除了 `vendor/`、`runtime/`、`release/`、`node_modules/`、`web/node_modules/` 和 `.venv/`。
+The scan excluded `vendor/`, `runtime/`, `release/`, `node_modules/`, `web/node_modules/`, and `.venv/`.
 
-发现结果：
+Findings:
 
-- `.env` 内存在真实 `OPENAI_API_KEY` 与 `FIRECRAWL_KEY`，但 `.gitignore` 已明确忽略。
-- 源码与文档中只发现示例占位值，例如 `OPENAI_API_KEY=...`、`FIRECRAWL_KEY=...` 和测试用 `test-key`。
-- `web/dist/` 和 `agent.egg-info/` 含有构建后的旧内容，开源时不应提交。
+- `.env` contains real `OPENAI_API_KEY` and `FIRECRAWL_KEY`, but `.gitignore` explicitly excludes it from version control.
+- Source code and docs only contain placeholder examples such as `OPENAI_API_KEY=...`, `FIRECRAWL_KEY=...`, and a `test-key` fixture.
+- `web/dist/` and generated `*.egg-info/` directories contain build leftovers and should not be published.
 
-## 本地运行产物
+## Local Runtime Artifacts
 
-当前工作区包含较多本地运行数据：
+The working directory still contains substantial local runtime data:
 
 - `runtime/conversation_logs/`
 - `runtime/sessions/`
@@ -40,13 +40,13 @@
 - `web/test-results/`
 - `agent.egg-info/`
 - `motus_agent_workbench.egg-info/`
-- 多处 `__pycache__/` 和 `*.pyc`
+- multiple `__pycache__/` folders and `*.pyc` files
 
-这些文件可能包含会话内容、调试截图、trace 元数据、上传文件或本地构建结果，默认不要公开。
+These artifacts may include conversation content, debugging screenshots, trace metadata, uploaded files, or local build output and should remain private by default.
 
-## 建议清理但未执行
+## Suggested Cleanup Not Yet Executed
 
-以下清理会删除本地缓存、构建产物和运行记录，需确认后再执行：
+The following commands will delete local caches, build output, and generated artifacts. Run them only after confirming those records are no longer needed.
 
 ```bash
 find . -type d -name __pycache__ -prune -exec rm -rf {} +
@@ -54,27 +54,27 @@ find . -type f -name '*.pyc' -delete
 rm -rf *.egg-info node_modules web/node_modules web/dist web/coverage web/test-results release
 ```
 
-如果要清空全部本地运行数据，再额外执行：
+To remove all runtime state as well:
 
 ```bash
 rm -rf runtime
 ```
 
-执行 `rm -rf runtime` 前必须确认不需要保留会话、上传文件、预览产物、截图和 smoke 记录。
+Do not run `rm -rf runtime` unless you are sure user sessions, uploads, preview artifacts, screenshots, and smoke logs are no longer needed.
 
-## 发布前待确认
+## Release-time Follow-ups
 
-- 确认 `vendor/minimax-skills/` 子模块在公开克隆场景下可正常初始化，并接受其上游许可证边界。
-- 确认是否保留历史规划类文档，或迁移到 `docs/archive/`。
-- 确认是否需要公开示例截图；如需要，应先脱敏并移动到 `docs/assets/`。
+- Confirm that the `vendor/minimax-skills/` submodule initializes correctly for public clones and that its upstream licensing boundary is acceptable.
+- Historical planning documents, one-off TODOs, matrices, and generated smoke result records were removed from `docs/` to keep public documentation stable and focused.
+- Decide whether any screenshots should be made public. If so, sanitize them and move them into `docs/assets/`.
 
-## 验证结果
+## Validation Results
 
-2026-04-20 已执行：
+Executed on 2026-04-20:
 
-- `uv run python -m py_compile apps/*.py core/**/*.py tools/**/*.py scripts/**/*.py`：通过。
-- `uv run pytest`：通过，70 passed，1 个第三方 `google.genai` deprecation warning。
-- `cd web && npm run build`：通过，保留 Vite 大 chunk 警告。
-- `cd web && npm run test`：通过，25 个 test files / 64 tests passed。测试期间 jsdom 提示 `HTMLCanvasElement.getContext()` 未实现，不影响退出码。
+- `uv run python -m py_compile apps/*.py core/**/*.py tools/**/*.py scripts/**/*.py`: passed
+- `uv run pytest`: passed, 70 tests passed, 1 third-party `google.genai` deprecation warning
+- `cd web && npm run build`: passed, with existing Vite large-chunk warnings
+- `cd web && npm run test`: passed, 25 test files / 64 tests passed; jsdom reported `HTMLCanvasElement.getContext()` limitations but exit status was still successful
 
-本次还补充了 `pytest` dev 依赖并更新 `uv.lock`，确保 README 中的测试命令可直接执行。
+This audit pass also added `pytest` as a development dependency and updated `uv.lock` so the documented test commands work directly.

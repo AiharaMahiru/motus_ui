@@ -11,7 +11,7 @@ load_project_env()
 
 
 def resolve_real_hitl_model(*, preferred_env_key: str = "SMOKE_REAL_HITL_MODEL") -> tuple[str | None, list[str]]:
-    """优先选择当前网关可实际完成请求的模型。"""
+    """Prefer a model that can complete a real request through the current gateway."""
 
     preferred = os.getenv(preferred_env_key, "").strip()
     candidates = [
@@ -29,7 +29,7 @@ def resolve_real_hitl_model(*, preferred_env_key: str = "SMOKE_REAL_HITL_MODEL")
     api_key = os.getenv("OPENAI_API_KEY")
     base_url = os.getenv("OPENAI_BASE_URL")
     if not api_key:
-        return None, ["OPENAI_API_KEY 未配置"]
+        return None, ["OPENAI_API_KEY is not configured"]
 
     client = OpenAI(api_key=api_key, base_url=base_url)
     probe_logs: list[str] = []

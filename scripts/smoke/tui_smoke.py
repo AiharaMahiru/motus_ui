@@ -14,7 +14,7 @@ from scripts.smoke.common import SmokeCaseResult, case_result, now_iso
 
 async def run() -> list[SmokeCaseResult]:
     setup_service = ChatService()
-    restored_title = f"TUI 恢复回归 {uuid.uuid4().hex[:8]}"
+    restored_title = f"TUI recovery regression {uuid.uuid4().hex[:8]}"
     restored_detail = setup_service.create_session(
         SessionCreateRequest(
             title=restored_title,
@@ -41,7 +41,7 @@ async def run() -> list[SmokeCaseResult]:
             restored_detail.session_id,
             "session.started",
             {
-                "content": "smoke 步骤条显示校验",
+                "content": "smoke step-bar display check",
                 "timestamp": "2026-04-16T12:34:56",
             },
         )
@@ -49,7 +49,7 @@ async def run() -> list[SmokeCaseResult]:
 
         screenshot_svg = app.export_screenshot(title="tui-smoke")
         screenshot_path.write_text(screenshot_svg, encoding="utf-8")
-        step_text_present = "步骤条" in screenshot_svg and "显示校验" in screenshot_svg
+        step_text_present = "step bar" in screenshot_svg and "display check" in screenshot_svg
 
         passed = (
             app.active_session_id is not None
@@ -68,10 +68,10 @@ async def run() -> list[SmokeCaseResult]:
 
         return [
             case_result(
-                name="TUI 无头启动",
+                name="TUI headless startup",
                 started_at=started_at,
                 status="passed" if passed else "failed",
-                summary="TUI 成功恢复历史会话，并正常渲染系统事件条" if passed else "TUI 会话恢复或系统事件条渲染未达到预期",
+                summary="TUI restored history sessions and rendered the system event strip" if passed else "TUI session recovery or system event strip rendering did not meet expectations",
                 details=[
                     f"active_session_id={app.active_session_id}",
                     f"session_count={len(app.sessions)}",
@@ -88,7 +88,7 @@ async def run() -> list[SmokeCaseResult]:
                     f"step_event_text_present={step_text_present}",
                 ],
                 artifacts=[str(screenshot_path)],
-                error=None if passed else "TUI 关键组件未初始化",
+                error=None if passed else "TUI key components were not initialized",
             )
         ]
 

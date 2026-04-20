@@ -44,9 +44,9 @@ async def run() -> list[SmokeCaseResult]:
 
             results.append(
                 case_result(
-                    name="HTTP API 健康检查",
+                    name="HTTP API health check",
                     started_at=started_at,
-                    summary="HTTP 服务启动成功，health 接口可访问",
+                    summary="HTTP service started and health endpoint is reachable",
                     details=[f"base_url={base_url}", f"health={health.json()}"],
                     artifacts=[str(process.stdout_path), str(process.stderr_path)],
                 )
@@ -57,7 +57,7 @@ async def run() -> list[SmokeCaseResult]:
                 "/api/sessions",
                 json={
                     "model_name": SMOKE_MODEL_NAME,
-                    "system_prompt": "你是回归测试助手。用户要求返回 token 时，必须原样返回。",
+                    "system_prompt": "You are a regression-test assistant. When the user asks for a token, return it exactly.",
                     "thinking": {"enabled": False, "effort": None, "verbosity": None},
                 },
             )
@@ -68,7 +68,7 @@ async def run() -> list[SmokeCaseResult]:
             events = await collect_sse_events(
                 client,
                 f"/api/sessions/{session_id}/messages/stream",
-                json_payload={"content": f"请原样返回这个 token：{token}"},
+                json_payload={"content": f"Return this token exactly: {token}"},
             )
             event_names = [event["event"] for event in events]
             final_events = [event for event in events if event["event"] == "assistant.final"]
@@ -93,10 +93,10 @@ async def run() -> list[SmokeCaseResult]:
             )
             results.append(
                 case_result(
-                    name="HTTP API 会话与流式事件",
+                    name="HTTP API session and stream events",
                     started_at=session_started_at,
                     status="passed" if passed_session else "failed",
-                    summary="会话创建、SSE 流和 session tracing 接口正常" if passed_session else "会话流式链路未达到预期",
+                    summary="Session creation, SSE stream, and session tracing endpoints are healthy" if passed_session else "Session streaming path did not meet expectations",
                     details=[
                         f"session_id={session_id}",
                         f"event_names={event_names}",
@@ -111,7 +111,7 @@ async def run() -> list[SmokeCaseResult]:
                             for name in tracing_export_data.get("files", [])
                         ],
                     ],
-                    error=None if passed_session else f"SSE 事件或 assistant 内容不符合预期: {event_names}",
+                    error=None if passed_session else f"SSE events or assistant content did not meet expectations: {event_names}",
                 )
             )
 
@@ -120,7 +120,7 @@ async def run() -> list[SmokeCaseResult]:
                 "/api/workflows/runs",
                 json={
                     "workflow_name": "text_insights",
-                    "input_payload": {"text": "# 标题\n\n这是第一段。\n\n这是第二段。"},
+                    "input_payload": {"text": "# Title\n\nThis is the first paragraph.\n\nThis is the second paragraph."},
                 },
             )
             workflow_resp.raise_for_status()
@@ -144,10 +144,10 @@ async def run() -> list[SmokeCaseResult]:
             passed_workflow = current_data["status"] == "completed" and bool(workflow_export_data.get("files"))
             results.append(
                 case_result(
-                    name="HTTP API Workflow 与 Tracing",
+                    name="HTTP API workflow and tracing",
                     started_at=workflow_started_at,
                     status="passed" if passed_workflow else "failed",
-                    summary="workflow API 与 workflow run tracing 接口正常" if passed_workflow else "workflow API 或 tracing 接口未达到预期",
+                    summary="Workflow API and workflow-run tracing endpoints are healthy" if passed_workflow else "Workflow API or tracing endpoint did not meet expectations",
                     details=[
                         f"run_id={run_id}",
                         f"workflow_status={current_data['status']}",
@@ -161,7 +161,7 @@ async def run() -> list[SmokeCaseResult]:
                             for name in workflow_export_data.get("files", [])
                         ],
                     ],
-                    error=None if passed_workflow else current_data.get("error") or "workflow 未完成",
+                    error=None if passed_workflow else current_data.get("error") or "workflow did not complete",
                 )
             )
     finally:

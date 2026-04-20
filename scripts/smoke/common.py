@@ -28,7 +28,7 @@ def now_iso() -> str:
 
 
 def default_smoke_env() -> dict[str, str]:
-    """构造 smoke 测试进程的基础环境变量。"""
+    """Build the base environment for smoke-test subprocesses."""
 
     env = os.environ.copy()
     env.setdefault("SMOKE_MODEL_NAME", "gpt-5.4-mini")
@@ -40,7 +40,7 @@ def default_smoke_env() -> dict[str, str]:
 
 @dataclass
 class SmokeCaseResult:
-    """单条 smoke 用例结果。"""
+    """Result for one smoke-test case."""
 
     name: str
     status: str
@@ -58,7 +58,7 @@ class SmokeCaseResult:
 
 @dataclass
 class ManagedProcess:
-    """后台进程句柄与日志位置。"""
+    """Background process handle and log paths."""
 
     name: str
     process: subprocess.Popen[Any]
@@ -77,7 +77,7 @@ class ManagedProcess:
 
 
 def run_shell(command: str, *, timeout_seconds: int = 120, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
-    """在 zsh 中执行命令并返回完整结果。"""
+    """Run a shell command through zsh and return the full result."""
 
     return subprocess.run(
         ["zsh", "-lc", command],
@@ -97,7 +97,7 @@ def run_shell_in(
     timeout_seconds: int = 120,
     env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
-    """在指定目录执行 shell 命令并返回完整结果。"""
+    """Run a shell command in a specific working directory and return the full result."""
 
     return subprocess.run(
         ["zsh", "-lc", command],
@@ -111,7 +111,7 @@ def run_shell_in(
 
 
 def choose_free_port() -> int:
-    """选择一个当前未被占用的本地端口。"""
+    """Choose an available local port."""
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind(("127.0.0.1", 0))
@@ -125,10 +125,10 @@ def start_python_process(
     module: str | None = None,
     env: dict[str, str] | None = None,
 ) -> ManagedProcess:
-    """启动一个后台 Python 进程，并将日志写入 runtime/smoke/logs。"""
+    """Start a background Python process and write logs under runtime/smoke/logs."""
 
     if not code and not module:
-        raise ValueError("code 和 module 至少要提供一个")
+        raise ValueError("Either code or module must be provided")
 
     stdout_path = SMOKE_LOG_DIR / f"{name}.stdout.log"
     stderr_path = SMOKE_LOG_DIR / f"{name}.stderr.log"
@@ -163,7 +163,7 @@ def start_background_process(
     cwd: Path | None = None,
     env: dict[str, str] | None = None,
 ) -> ManagedProcess:
-    """启动任意后台进程，并将日志写入 runtime/smoke/logs。"""
+    """Start a background process and write logs under runtime/smoke/logs."""
 
     stdout_path = SMOKE_LOG_DIR / f"{name}.stdout.log"
     stderr_path = SMOKE_LOG_DIR / f"{name}.stderr.log"
@@ -187,7 +187,7 @@ def start_background_process(
 
 
 async def wait_for_http(url: str, *, timeout_seconds: float = 20.0) -> None:
-    """轮询 HTTP 服务直到可用。"""
+    """Poll an HTTP endpoint until it becomes available."""
 
     deadline = time.monotonic() + timeout_seconds
     async with httpx.AsyncClient(timeout=2.0) as client:
@@ -199,7 +199,7 @@ async def wait_for_http(url: str, *, timeout_seconds: float = 20.0) -> None:
             except Exception:
                 pass
             await asyncio.sleep(0.2)
-    raise TimeoutError(f"等待 HTTP 服务超时: {url}")
+    raise TimeoutError(f"Timed out waiting for HTTP service: {url}")
 
 
 async def collect_sse_events(
@@ -209,7 +209,7 @@ async def collect_sse_events(
     json_payload: dict[str, Any],
     timeout_seconds: float = 60.0,
 ) -> list[dict[str, Any]]:
-    """读取 SSE 流并解析为事件列表。"""
+    """Read an SSE stream and return parsed events."""
 
     events: list[dict[str, Any]] = []
     deadline = time.monotonic() + timeout_seconds
@@ -220,7 +220,7 @@ async def collect_sse_events(
         data_lines: list[str] = []
         async for raw_line in response.aiter_lines():
             if time.monotonic() > deadline:
-                raise TimeoutError(f"SSE 超时: {url}")
+                raise TimeoutError(f"SSE timed out: {url}")
 
             line = raw_line.strip()
             if not line:
@@ -253,7 +253,7 @@ def case_result(
     error: str | None = None,
     status: str = "passed",
 ) -> SmokeCaseResult:
-    """基于开始时间生成标准化结果对象。"""
+    """Build a normalized smoke-test result from the start time."""
 
     finished_at = now_iso()
     started_dt = datetime.fromisoformat(started_at)
@@ -273,7 +273,7 @@ def case_result(
 
 
 def markdown_report(title: str, results: list[SmokeCaseResult], *, generated_at: str) -> str:
-    """把测试结果渲染成 Markdown 文档。"""
+    """Render smoke-test results as Markdown."""
 
     passed = sum(1 for item in results if item.status == "passed")
     failed = sum(1 for item in results if item.status == "failed")
@@ -282,36 +282,36 @@ def markdown_report(title: str, results: list[SmokeCaseResult], *, generated_at:
     lines = [
         f"# {title}",
         "",
-        f"- 生成时间：`{generated_at}`",
-        f"- 通过：`{passed}`",
-        f"- 失败：`{failed}`",
-        f"- 跳过：`{skipped}`",
+        f"- Generated at: `{generated_at}`",
+        f"- Passed: `{passed}`",
+        f"- Failed: `{failed}`",
+        f"- Skipped: `{skipped}`",
         "",
-        "## 结果明细",
+        "## Result Details",
         "",
     ]
 
     for item in results:
         lines.append(f"### {item.name}")
         lines.append("")
-        lines.append(f"- 状态：`{item.status}`")
-        lines.append(f"- 摘要：{item.summary}")
-        lines.append(f"- 开始：`{item.started_at}`")
-        lines.append(f"- 结束：`{item.finished_at}`")
-        lines.append(f"- 耗时：`{item.duration_seconds:.2f}s`")
+        lines.append(f"- Status: `{item.status}`")
+        lines.append(f"- Summary: {item.summary}")
+        lines.append(f"- Started: `{item.started_at}`")
+        lines.append(f"- Finished: `{item.finished_at}`")
+        lines.append(f"- Duration: `{item.duration_seconds:.2f}s`")
         if item.details:
-            lines.append("- 现象：")
+            lines.append("- Observations:")
             for detail in item.details:
                 lines.append(f"  - {detail}")
         if item.artifacts:
-            lines.append("- 产物：")
+            lines.append("- Artifacts:")
             for artifact in item.artifacts:
                 lines.append(f"  - `{artifact}`")
         if item.error:
-            lines.append(f"- 错误：`{item.error}`")
+            lines.append(f"- Error: `{item.error}`")
         lines.append("")
 
-    lines.append("## 原始 JSON")
+    lines.append("## Raw JSON")
     lines.append("")
     lines.append("```json")
     lines.append(

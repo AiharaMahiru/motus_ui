@@ -28,16 +28,16 @@ async def run() -> list[SmokeCaseResult]:
     build_passed = build_result.returncode == 0
     results.append(
         case_result(
-            name="WebUI 构建",
+            name="WebUI build",
             started_at=build_started_at,
             status="passed" if build_passed else "failed",
-            summary="WebUI 构建通过" if build_passed else "WebUI 构建失败",
+            summary="WebUI build passed" if build_passed else "WebUI build failed",
             details=[
                 f"returncode={build_result.returncode}",
                 f"stdout_tail={build_result.stdout.strip()[-400:]}",
                 f"stderr_tail={build_result.stderr.strip()[-400:]}",
             ],
-            error=None if build_passed else "npm run build 未通过",
+            error=None if build_passed else "npm run build failed",
         )
     )
     if not build_passed:
@@ -87,7 +87,7 @@ async def run() -> list[SmokeCaseResult]:
                 name="WebUI E2E",
                 started_at=started_at,
                 status="passed" if passed else "failed",
-                summary="WebUI 真实页面链路通过" if passed else "WebUI E2E 未通过",
+                summary="WebUI real-page path passed" if passed else "WebUI E2E failed",
                 details=[
                     f"api_base_url={api_base_url}",
                     f"web_base_url={web_base_url}",
@@ -102,7 +102,7 @@ async def run() -> list[SmokeCaseResult]:
                     str(web_process.stderr_path),
                     str(WEB_DIR / "test-results"),
                 ],
-                error=None if passed else "Playwright E2E 执行失败",
+                error=None if passed else "Playwright E2E execution failed",
             )
         )
     finally:
