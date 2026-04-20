@@ -4,12 +4,15 @@
 [![Python](https://img.shields.io/badge/python-3.14-3776AB.svg)](https://www.python.org/)
 [![Frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20Vite-61DAFB.svg)](web/)
 [![Backend](https://img.shields.io/badge/backend-FastAPI-009688.svg)](apps/server.py)
+[![Motus](https://img.shields.io/badge/built%20on-Motus-111827.svg)](https://github.com/lithos-ai/motus)
 
 English | [简体中文](README.zh-CN.md)
 
 Motus Agent Workbench is a local-first agent project built on top of the Motus SDK. It combines a unified Python backend, session-oriented HITL flows, tool and skill runtime hosting, workflow orchestration, tracing, code preview runtimes, and a production-oriented React WebUI.
 
 The goal is not to ship another chat wrapper. The goal is to consolidate **sessions, tool execution, approvals, tracing, preview, and visualization** into one reusable local agent architecture that can keep evolving into desktop, Tauri, or other UI surfaces.
+
+This project builds on the upstream [lithos-ai/motus](https://github.com/lithos-ai/motus) open-source agent-serving project. Motus provides the SDK and runtime foundation; this repository focuses on the local workbench, unified backend adapters, WebUI, preview runtime, and integration layer around it.
 
 ![Motus Agent Workbench banner](docs/assets/readme-banner.svg)
 
@@ -69,7 +72,7 @@ flowchart LR
 
 ## Tech Stack
 
-- Backend: Python 3.14, FastAPI, Motus SDK, `uv`
+- Backend: Python 3.14, FastAPI, [Motus SDK](https://github.com/lithos-ai/motus), `uv`
 - Frontend: React 19, TypeScript, Vite, TanStack Query, Tailwind CSS 4
 - Testing: pytest, Vitest, Playwright
 - Visualization and rendering: Mermaid, ECharts, highlight.js, xterm
