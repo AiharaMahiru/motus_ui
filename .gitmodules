@@ -1,0 +1,3 @@
+[submodule "vendor/minimax-skills"]
+	path = vendor/minimax-skills
+	url = https://github.com/MiniMax-AI/skills.git

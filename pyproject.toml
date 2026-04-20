@@ -1,0 +1,39 @@
+[project]
+name = "motus-agent-workbench"
+version = "0.1.0"
+description = "Motus SDK based local agent backend and web workbench."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.115.0",
+    "firecrawl-py>=4.22.2",
+    "httpx>=0.28.1",
+    "lithosai-motus[google-adk,openai-agents]>=0.3.0",
+    "python-dotenv>=1.2.2",
+    "textual>=0.74",
+    "uvicorn>=0.30.6",
+]
+
+[project.scripts]
+agent-server = "apps.server:main"
+agent-tui = "apps.tui:main"
+agent-hitl-server = "apps.hitl:main"
+
+
+[tool.uv]
+package = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["apps", "apps.*", "core", "core.*", "tools", "tools.*"]
+
+[tool.setuptools.package-data]
+"core.ui" = ["tui.tcss"]

@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+*.egg-info/
+build/
+dist/
+
+# Runtime data
+/runtime/
+/release/
+
+# Local secrets and machine-specific config
+.env
+.env.*
+!.env.example
+/.codex-tasks/
+/.omx/
+
+# Web build artifacts
+/node_modules/
+web/node_modules/
+web/dist/
+web/coverage/
+web/test-results/
+/.vite/
+/coverage/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Logs and temporary archives
+*.log
+*.tmp
+*.bak
+*.zip
+*.tar
+*.tar.gz
+
+# Local task scratch files
+*TO DO list.csv
