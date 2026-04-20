@@ -1,87 +1,129 @@
 # Motus Agent Workbench
 
-Motus Agent Workbench 是一个基于 Motus SDK 的本地 Agent 工作台，提供统一 Python 后端、HITL 会话链路、工具与 skill 运行时、Workflow 编排能力，以及面向日常使用的 React WebUI。
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.14-3776AB.svg)](https://www.python.org/)
+[![Frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20Vite-61DAFB.svg)](web/)
+[![Backend](https://img.shields.io/badge/backend-FastAPI-009688.svg)](apps/server.py)
 
-项目目标不是只做一个聊天壳，而是把 **会话、工具调用、审批、追踪、代码预览、可视化表达** 收敛到同一套可复用的本地 Agent 架构里，方便后续继续接桌面端、Tauri 或其他 UI。
+English | [简体中文](README.zh-CN.md)
 
-## 核心能力
+Motus Agent Workbench is a local-first agent project built on top of the Motus SDK. It combines a unified Python backend, session-oriented HITL flows, tool and skill runtime hosting, workflow orchestration, tracing, code preview runtimes, and a production-oriented React WebUI.
 
-- Session-first 架构：每个会话有独立配置、消息历史、usage/cost 统计、标题和状态机。
-- 统一 backend 抽象：WebUI 通过 `core.backends` 适配本地 backend 与 HITL backend。
-- HITL：支持 interrupt / resume、工具审批、问题回填、运行中 telemetry 与恢复。
-- Workflow：支持工作流注册、规划、执行、取消、终止与 tracing。
-- 代码预览：支持 HTML / React / Python 快速运行与 Python 终端输出。
-- 可视化增强：支持 Mermaid、结构化图表和数据分析图表内嵌。
-- WebUI：覆盖会话、工作流、追踪、运行时目录、预览窗口、主题与 i18n。
+The goal is not to ship another chat wrapper. The goal is to consolidate **sessions, tool execution, approvals, tracing, preview, and visualization** into one reusable local agent architecture that can keep evolving into desktop, Tauri, or other UI surfaces.
 
-## 技术栈
+## Highlights
 
-- 后端：Python 3.14、FastAPI、Motus SDK、uv
-- 前端：React 19、TypeScript、Vite、TanStack Query、Tailwind CSS 4
-- 测试：pytest、Vitest、Playwright
-- 图表与渲染：Mermaid、ECharts、highlight.js、xterm
+- Session-first architecture with per-session config, history, title generation, usage, cost, and runtime state.
+- Unified backend abstraction for both local and HITL session execution.
+- HITL support for interrupts, resume flows, tool approval, question answering, and live telemetry.
+- Workflow registry, planner, execution, cancel/terminate control, and tracing integration.
+- Built-in HTML / React / Python preview runtime with Python terminal output.
+- Embedded visualization support for Mermaid, structured charts, and data-analysis oriented blocks.
+- React WebUI covering chat, workflow, tracing, runtime catalog, preview dock, themes, and i18n.
 
-## 项目结构
+## Screenshot
 
-```text
-apps/                  启动入口
-core/                  后端核心运行时代码
-core/backends/         UI 复用的 session backend 抽象
-core/chat/             会话服务、消息存储、标题生成
-core/preview/          HTML / React / Python 预览运行时
-core/servers/          FastAPI 与 HITL 服务入口
-core/schemas/          前后端共享 schema
-core/workflows/        工作流注册、执行和持久化
-docs/                  开发文档、接入说明、smoke 记录
-scripts/smoke/         系统级 smoke 脚本
-skills/                项目内运行时 skill 入口
-tests/                 Python 测试
-tools/integrations/    工具实现与第三方集成
-vendor/minimax-skills/ 第三方 skills 子模块
-web/                   React WebUI
-runtime/               本地运行产物，默认不入库
+![Motus Agent Workbench hero preview](web/src/assets/hero.png)
+
+## Architecture
+
+```mermaid
+flowchart LR
+    User[User] --> WebUI[React WebUI]
+    User --> APIClient[CLI / curl / external client]
+
+    WebUI --> API[FastAPI API]
+    APIClient --> API
+
+    API --> Backend[SessionBackend abstraction]
+    Backend --> Local[Local backend]
+    Backend --> HITL[HITL backend]
+
+    Local --> Chat[Chat service]
+    HITL --> Chat
+    Chat --> Agents[Motus agents]
+    Chat --> Tools[Built-in tools + integrations]
+    Chat --> Skills[skills/ runtime entry layer]
+
+    API --> Workflow[Workflow service]
+    API --> Preview[Preview runtime]
+    API --> Tracing[Tracing service]
+
+    Skills --> Vendor[vendored MiniMax skills submodule]
+    Tools --> Runtime[runtime/ artifacts]
+    Workflow --> Runtime
+    Preview --> Runtime
+    Tracing --> Runtime
 ```
 
-更详细说明见：
+## Tech Stack
 
-- `docs/项目结构梳理.md`
-- `docs/开发文档.md`
-- `docs/前端接入说明.md`
+- Backend: Python 3.14, FastAPI, Motus SDK, `uv`
+- Frontend: React 19, TypeScript, Vite, TanStack Query, Tailwind CSS 4
+- Testing: pytest, Vitest, Playwright
+- Visualization and rendering: Mermaid, ECharts, highlight.js, xterm
 
-## 快速开始
+## Repository Layout
 
-### 1. 克隆仓库
+```text
+apps/                  Entrypoints
+core/                  Backend runtime implementation
+core/backends/         Shared session backend abstraction
+core/chat/             Sessions, history, titles, turn flow
+core/preview/          HTML / React / Python preview runtime
+core/servers/          FastAPI and HITL servers
+core/schemas/          Shared schemas for backend and frontend
+core/workflows/        Workflow registry, execution, persistence
+docs/                  Architecture notes, plans, smoke results
+scripts/smoke/         End-to-end and system smoke scripts
+skills/                Runtime skill entry layer
+tests/                 Python tests
+tools/integrations/    Tool implementations and integrations
+vendor/minimax-skills/ Third-party skills submodule
+web/                   React WebUI
+runtime/               Local runtime artifacts, not committed
+```
 
-如果是首次拉取，建议带上 submodule：
+Additional docs:
+
+- [`docs/项目结构梳理.md`](docs/%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84%E6%A2%B3%E7%90%86.md)
+- [`docs/开发文档.md`](docs/%E5%BC%80%E5%8F%91%E6%96%87%E6%A1%A3.md)
+- [`docs/前端接入说明.md`](docs/%E5%89%8D%E7%AB%AF%E6%8E%A5%E5%85%A5%E8%AF%B4%E6%98%8E.md)
+
+## Quick Start
+
+### 1. Clone the repository
+
+Clone with submodules from the beginning:
 
 ```bash
 git clone --recurse-submodules <repo-url>
 cd motus_ui
 ```
 
-如果已经拉下仓库，再补一次：
+If you already cloned the repository, initialize submodules once:
 
 ```bash
 git submodule update --init --recursive
 ```
 
-### 2. 准备环境变量
+### 2. Prepare environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-常用变量：
+Common variables:
 
 - `OPENAI_API_KEY`
 - `OPENAI_BASE_URL`
-- `FIRECRAWL_KEY` 或 `FIRECRAWL_API_KEY`
+- `FIRECRAWL_KEY` or `FIRECRAWL_API_KEY`
 - `APP_BACKEND_MODE`
 - `MOTUS_TRACING_*`
 
-真实密钥只写本地 `.env`，不要提交到仓库。
+Keep real secrets in the local `.env` file only.
 
-### 3. 安装依赖
+### 3. Install dependencies
 
 ```bash
 uv sync
@@ -90,34 +132,34 @@ npm install
 cd ..
 ```
 
-### 4. 启动后端
+### 4. Start the backend
 
 ```bash
 uv run agent-server
 ```
 
-可选入口：
+Optional entrypoints:
 
 ```bash
 uv run agent-hitl-server
 uv run agent-tui
 ```
 
-默认常用地址：
+Typical local endpoints:
 
-- API：`http://127.0.0.1:8000/api`
-- WebUI：按 Vite 输出为准，通常是 `http://127.0.0.1:5173`
+- API: `http://127.0.0.1:8000/api`
+- WebUI: usually `http://127.0.0.1:5173`
 
-### 5. 启动 WebUI
+### 5. Start the WebUI
 
 ```bash
 cd web
 npm run dev
 ```
 
-## 常用命令
+## Common Commands
 
-后端：
+Backend:
 
 ```bash
 uv run pytest
@@ -125,7 +167,7 @@ uv run python -m py_compile apps/*.py core/**/*.py tools/**/*.py scripts/**/*.py
 uv run python -m scripts.smoke.run_all
 ```
 
-前端：
+Frontend:
 
 ```bash
 cd web
@@ -135,55 +177,55 @@ npm run e2e
 npm run lint
 ```
 
-## 一条最小 API 示例
+## Minimal API Example
 
-创建会话：
+Create a session:
 
 ```bash
 curl -s http://127.0.0.1:8000/api/sessions \
   -H 'Content-Type: application/json' \
-  -d '{"system_prompt":"你是一个可靠的中文助理。","model_name":"gpt-4o"}'
+  -d '{"system_prompt":"You are a reliable assistant.","model_name":"gpt-4o"}'
 ```
 
-发送消息：
+Send a message:
 
 ```bash
 curl -s http://127.0.0.1:8000/api/sessions/<session_id>/messages \
   -H 'Content-Type: application/json' \
-  -d '{"content":"用一句话介绍这个项目。"}'
+  -d '{"content":"Summarize this project in one sentence."}'
 ```
 
-流式消息：
+Stream a turn:
 
 ```bash
 curl -N http://127.0.0.1:8000/api/sessions/<session_id>/messages/stream \
   -H 'Content-Type: application/json' \
-  -d '{"content":"先调用工具，再总结结果。"}'
+  -d '{"content":"Use tools first, then summarize the result."}'
 ```
 
-## 仓库约定
+## Repository Conventions
 
-- `runtime/`、`release/`、`.venv/`、`node_modules/`、`web/dist/`、coverage 和 test-results 不入库。
-- 会话日志、trace、上传文件、预览输出和调试截图默认视为敏感数据。
-- `skills/` 是运行时入口层，`tools/integrations/` 是实现层工具代码，两者不要混用。
-- `vendor/minimax-skills/` 以 Git submodule 方式接入，保留上游历史与许可证边界。
+- `runtime/`, `release/`, `.venv/`, `node_modules/`, `web/dist/`, coverage output, and test-results are not committed.
+- Session logs, traces, uploads, preview artifacts, and debug screenshots should be treated as sensitive data.
+- `skills/` is the runtime skill entry layer, while `tools/integrations/` contains concrete implementation code.
+- `vendor/minimax-skills/` is intentionally kept as a Git submodule to preserve upstream history and license boundaries.
 
-## 文档入口
+## Documentation
 
-- `AGENTS.md`：贡献者与编码约定
-- `CONTRIBUTING.md`：贡献流程与 PR 要求
-- `SECURITY.md`：安全策略与敏感数据说明
-- `docs/runtime-requirements.md`：工具、MCP、skills 的运行时依赖
-- `docs/open-source-release-checklist.md`：开源发布检查清单
-- `docs/open-source-audit.md`：当前仓库开源整理审计记录
+- [`AGENTS.md`](AGENTS.md): contributor and coding conventions
+- [`CONTRIBUTING.md`](CONTRIBUTING.md): contribution process
+- [`SECURITY.md`](SECURITY.md): security policy
+- [`docs/runtime-requirements.md`](docs/runtime-requirements.md): runtime requirements for tools, MCP, and skills
+- [`docs/open-source-release-checklist.md`](docs/open-source-release-checklist.md): release checklist
+- [`docs/open-source-audit.md`](docs/open-source-audit.md): repository open-source audit
 
 ## License
 
-本仓库使用 **Apache License 2.0**，即 **Apache-2.0**。
+This repository is licensed under **Apache License 2.0** (`Apache-2.0`).
 
-之所以采用 Apache-2.0，是为了与当前 Motus 生态的开源许可证策略保持一致，也方便后续在企业和个人场景中复用、修改和分发。
+The root repository follows Apache-2.0 to stay aligned with the current Motus ecosystem licensing direction and to keep reuse, modification, and redistribution straightforward for both individual and enterprise use.
 
-注意：
+Notes:
 
-- 根仓库源码与文档适用 `LICENSE` 中的 Apache-2.0 条款。
-- `vendor/minimax-skills/` 是第三方上游仓库子模块，保留其自身历史与许可证信息。
+- The root repository source code and documentation are covered by the Apache-2.0 terms in [`LICENSE`](LICENSE).
+- `vendor/minimax-skills/` is an upstream third-party submodule and keeps its own history and licensing context.
